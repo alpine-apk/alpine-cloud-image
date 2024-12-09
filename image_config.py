@@ -20,7 +20,7 @@ class ImageConfig():
         'qcow2': 'ln -f {opts} {src} {dst}',
         'vhd': 'qemu-img convert -f qcow2 -O vpc {opts} {src} {dst}',
         # NOTE: resizes to 1G,
-        'raw.tar.gz' : 'qemu-img convert -f qcow2 -O raw {opts} {src} disk.raw && qemu-img resize -f raw disk.raw 1G && gtar --format=oldgnu -zcvf {dst} disk.raw'
+        'raw.tar.gz' : 'qemu-img convert -f qcow2 -O raw {opts} {src} disk.raw && qemu-img resize -f raw disk.raw 1G && gtar --format=oldgnu -zcvf {dst} disk.raw && rm disk.raw'
     }
     CONVERT_OPTS = {
         None: '',
