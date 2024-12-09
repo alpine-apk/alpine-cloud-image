@@ -32,13 +32,6 @@ def set_credential_provider(debug=False):
 
 ### forward to the correct adapter
 
-# TODO: deprecate/remove
-def get_latest_imported_tags(config):
-    return ADAPTERS[config.cloud].get_latest_imported_tags(
-        config.project,
-        config.image_key
-    )
-
 
 def import_image(config):
     return ADAPTERS[config.cloud].import_image(config)

@@ -6,9 +6,6 @@ from .interfaces.adapter import CloudAdapterInterface
 
 class OCICloudAdapter(CloudAdapterInterface):
 
-    def get_latest_imported_tags(self, project, image_key):
-        return None
-
     def import_image(self, ic):
         pass
 

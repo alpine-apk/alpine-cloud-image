@@ -189,6 +189,7 @@ install_grub_efi() {
 configure_system() {
     einfo "Configuring System"
 
+    # TODO? still need this?  or is it done by Tiny Cloud/cloud-init?
     # default network configuration
     install -o root -g root -Dm644 -t "$TARGET/etc/network" "$SETUP/interfaces"
 
@@ -204,8 +205,8 @@ configure_system() {
         cat "$SETUP/fstab.grub-efi" >> "$TARGET/etc/fstab"
     fi
 
-    # Disable getty for physical ttys, enable getty for serial console.
-    sed -Ei -e '/^tty[0-9]/s/^/#/' -e "s/ttyS0/$CONSOLE/g" \
+    # Disable all but one getty for physical ttys, enable getty for serial console.
+    sed -Ei -e '/^tty[2-9]/s/^/#/' -e "s/ttyS0/$CONSOLE/g" \
         -e "/^#$CONSOLE:/s/^#//" "$TARGET/etc/inittab"
 
     # setup sudo and/or doas

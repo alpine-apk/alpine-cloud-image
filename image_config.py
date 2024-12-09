@@ -17,14 +17,15 @@ from image_tags import ImageTags
 class ImageConfig():
 
     CONVERT_CMD = {
-        'qcow2': ['ln', '-f'],
-        'vhd': ['qemu-img', 'convert', '-f', 'qcow2', '-O', 'vpc'],
-        'raw': ['qemu-img', 'convert', '-f', 'qcow2', '-O', 'raw'],
+        'qcow2': 'ln -f {opts} {src} {dst}',
+        'vhd': 'qemu-img convert -f qcow2 -O vpc {opts} {src} {dst}',
+        # NOTE: resizes to 1G,
+        'raw.tar.gz' : 'qemu-img convert -f qcow2 -O raw {opts} {src} disk.raw && qemu-img resize -f raw disk.raw 1G && gtar --format=oldgnu -zcvf {dst} disk.raw'
     }
     CONVERT_OPTS = {
-        None: [],
-        'vhd/fixed_force-size': ['-o', 'subformat=fixed,force_size'],
-        'vhd/force-size': ['-o', 'force_size=on'],
+        None: '',
+        'vhd/fixed_force-size': '-o subformat=fixed,force_size',    # TODO: can this work for AWS too?
+        'vhd/force-size': '-o force_size=on',
     }
     COMPRESS_CMD = {
         'bz2': ['bzip2', '-c']
@@ -408,36 +409,32 @@ class ImageConfig():
         if 'image_format_opts' in self.__dict__:
             return self.CONVERT_OPTS[self.image_format_opts]
 
-        return []
+        return ''
 
     # convert local QCOW2 to format appropriate for a cloud
     def convert_image(self):
         self._log.info('Converting %s to %s', self.local_image, self.image_path)
         run(
-            self.CONVERT_CMD[self.image_format] + self.convert_opts
-                + [self.local_image, self.image_path],
+            self.CONVERT_CMD[self.image_format].format(opts=self.convert_opts, src=self.local_image, dst=self.image_path),
             log=self._log, errmsg='Unable to convert %s to %s',
-            errvals=[self.local_image, self.image_path]
+            errvals=[self.local_image, self.image_path],
+            shell=True
         )
         #self._save_checksum(self.image_path)
         self.built = datetime.utcnow().isoformat()
 
     def upload_image(self):
-        # TODO: compress here?  upload that instead
         self.storage.store(self.image_file, checksum=True)
         self.uploaded = datetime.utcnow().isoformat()
 
     def retrieve_image(self):
         self._log.info('Retrieving %s from storage', self.image_file)
-        # TODO: try downloading compressed and decompressed?
         self.storage.retrieve(self.image_file) #, checksum=True)
-        # TODO: decompress compressed if exists
 
     def remove_image(self):
         self.storage.remove(
             #self.image_file + '*',
             #self.metadata_file + '*')
-            # TODO: self.image_compressed, .asc, .sha512
             self.image_file,
             self.image_file + '.asc',
             self.image_file + '.sha512',
@@ -451,7 +448,6 @@ class ImageConfig():
             log.warning("No 'signing_cmd' set, not signing image.")
             return
 
-        # TODO: sign compressed file?
         cmd = self.signing_cmd.format(file=self.image_path).split(' ')
         log.info(f'Signing {self.image_file}...')
         log.debug(cmd)

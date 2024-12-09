@@ -1,6 +1,10 @@
 **/*~
 **/*.bak
 **/*.swp
+**/*.qcow2
+**/*.raw
+**/*.tar.gz
+**/*.vhd
 .DS_Store
 .vscode/
 /work/

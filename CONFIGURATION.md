@@ -214,10 +214,6 @@ The format/extension of the disk image, i.e. `qcow2`, `vhd`, or `raw`.
 Some formats have additional options; currently `vhd/force-size` and
 `vhd/fixed_force-size` are defined.
 
-### `image_compress` string
-
-***TODO***
-
 ### `login` string
 
 The image's primary login user, set to `alpine`.

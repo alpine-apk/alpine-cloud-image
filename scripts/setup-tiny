@@ -27,8 +27,15 @@ else
     sed -i.bak -Ee "s/^#?CLOUD_USER=.*/CLOUD_USER=$IMAGE_LOGIN/" "$TC_CONF"
     rm "$TC_CONF.bak"
 
-    # tiny-cloud >= 3.0.0 sets up init scripts with /sbin/tiny-cloud --setup
-    if [ -f "$TARGET/sbin/tiny-cloud" ]; then
+    if [ -f "$TARGET/usr/sbin/tiny-cloud" ]; then
+        # tiny-cloud >= 3.1.0 is in /usr/sbin
+        chroot "$TARGET" /usr/sbin/tiny-cloud --enable
+    elif greater_or_equal "$VERSION" 3.21; then
+        # 3.18 has tiny-cloud 3.1.0, and we didn't find what we expected
+        echo "Error: /usr/sbin/tiny-cloud not found" >&2
+        exit 1
+    elif [ -f "$TARGET/sbin/tiny-cloud" ]; then
+        # tiny-cloud >= 3.0.0 sets up init scripts with /sbin/tiny-cloud --setup
         chroot "$TARGET" /sbin/tiny-cloud --enable
     elif greater_or_equal "$VERSION" 3.18; then
         # 3.18 has tiny-cloud 3.0.0, and we didn't find what we expected

@@ -29,9 +29,6 @@ class CloudAdapterInterface:
     def session(self, region=None):
         raise NotImplementedError
 
-    def get_latest_imported_tags(self, project, image_key):
-        raise NotImplementedError
-
     def import_image(self, config):
         raise NotImplementedError
 

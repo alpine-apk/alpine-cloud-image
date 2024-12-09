@@ -13,13 +13,16 @@ from urllib.parse import urlparse
 from image_tags import DictObj
 
 
-def run(cmd, log, errmsg=None, errvals=[], err_ok=False):
+def run(cmd, log, errmsg=None, errvals=[], err_ok=False, shell=False):
     # ensure command and error values are lists of strings
-    cmd = [str(c) for c in cmd]
     errvals = [str(ev) for ev in errvals]
+    if not shell:
+        cmd = [str(c) for c in cmd]
+    else:
+        cmd = str(cmd)
 
-    log.debug('COMMAND: %s', ' '.join(cmd))
-    p = Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=PIPE, encoding='utf8')
+    log.debug('COMMAND: %s', cmd)
+    p = Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=PIPE, encoding='utf8', shell=shell)
     out, err = p.communicate()
     if p.returncode:
         if errmsg:
@@ -29,7 +32,7 @@ def run(cmd, log, errmsg=None, errvals=[], err_ok=False):
             else:
                 log.error(errmsg, *errvals)
 
-        log.debug('EXIT: %d / COMMAND: %s', p.returncode, ' '.join(cmd))
+        log.debug('EXIT: %d / COMMAND: %s', p.returncode, cmd)
         log.debug('STDOUT:\n%s', out)
         log.debug('STDERR:\n%s', err)
         raise RuntimeError
