@@ -498,6 +498,7 @@ class ImageConfig():
             revision_glob = self.name.format(**(self.__dict__ | {'revision': '*'}))
             try:
                 revision_yamls = self.storage.list(revision_glob + '.yaml', err_ok=True)
+                # TODO: check/restore from CDN?
                 new = not revision_yamls    # empty list is still new
 
             except RuntimeError:
