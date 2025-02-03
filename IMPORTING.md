@@ -69,7 +69,7 @@ gcloud auth login
 
 gcloud storage cp <alpine-raw.tar.gz-file> gs://<cloud-storage-bucket>
 
-gcloud compute image create <image-name> \
+gcloud compute images create <image-name> \
   --source-uri gs://<cloud-storage-bucket>/<alpine-raw.tar.gz-file> \
   --architecture {ARM64|X86_64}
   --guest-os-features GVNIC,VIRTIO_SCSI_MULTIQUEUE[,UEFI_COMPATIBLE]
