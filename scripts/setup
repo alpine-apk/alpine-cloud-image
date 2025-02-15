@@ -153,7 +153,7 @@ install_extlinux() {
         -e "s|^[# ]*(serial_port)=.*|\1=$CONSOLE|" \
         -e "s|^[# ]*(modules)=.*|\1=$KERNEL_MODULES|" \
         -e "s|^[# ]*(default)=.*|\1=virt|" \
-        -e "s|^[# ]*(timeout)=.*|\1=1|" \
+        -e "s|^[# ]*(timeout)=.*|\1=$BOOTLOADER_TIMEOUT|" \
         "$TARGET/etc/update-extlinux.conf"
 
     chroot "$TARGET" /sbin/extlinux --install /boot

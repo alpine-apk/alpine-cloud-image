@@ -166,6 +166,7 @@ build {
         "DEBUG=${var.DEBUG}",
         "ARCH=${B.value.arch}",
         "BOOTLOADER=${B.value.bootloader}",
+        "BOOTLOADER_TIMEOUT=${B.value.bootloader_timeout}"
         "BOOTSTRAP=${B.value.bootstrap}",
         "BUILD_NAME=${B.value.name}",
         "BUILD_REVISION=${B.value.revision}",
