@@ -1,0 +1,66 @@
+name: alpine cloud image build 
+
+permissions:
+  contents: write
+  
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: update system
+        run: |
+         set -eux
+          sudo apt update
+          sudo apt upgrade -y
+         
+      - name: install qemu 8.0.5 from source
+        run: |
+           set -eux
+            sudo apt-get install -y ninja-build
+            sudo apt-get install -y zlib1g zlib1g-dev
+            sudo apt-get install -y libglib2.0-dev
+            sudo apt-get install -y libpixman-1-dev
+            sudo apt-get install -y libslirp-dev 
+            wget https://download.qemu.org/qemu-8.0.5.tar.xz
+            tar xvJf qemu-8.0.5.tar.xz
+            cd qemu-8.0.5
+            ./configure --prefix=/usr  --sysconfdir=/etc --target-list=x86_64-softmmu --enable-slirp --disable-pa --localstatedir=/var 
+            make -j$(nproc)
+            sudo make install
+            
+      - name: Checkout  Repository
+        uses: actions/checkout@v4.1.1
+        with:
+         fetch-depth: 0
+   
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+           python-version: '3.12.1' 
+          
+      - name: install dependencies
+        run: |
+         python -m pip install --upgrade pip
+         pip install pyhocon
+         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      
+      - name: build alpine cloud image
+        run: |
+          set -eux
+           ./build local 
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4.4.0
+        with:
+           name: alpine
+           path: work/images/azure/*azure/*.vhd 
+
+
+
+
+
+ 
